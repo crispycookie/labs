@@ -1,0 +1,5 @@
+add(R1, R2)
+add(R1, R3)
+add(R1, R0)
+add(R1, R1)
+ins(R3, 2)
