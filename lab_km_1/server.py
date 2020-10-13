@@ -1,12 +1,11 @@
 import socket
 
 HOST = '127.0.0.1'
-PORT = 65432
+PORT = 6543
 
 def form_table():
-    table = [[0 for i in range(10)] for j in range(10)]
-    for i in  range(len(table)):
-        print(table[i])
+    head = [" ", "a", "b", "c", "d", "e", "f", "g", "h", "i", "k"]
+    table = [[("0" if i else str(j)) for i in range(11)] if j else head for j in range(11)]
     return table
 
 def form_stat():
@@ -14,10 +13,25 @@ def form_stat():
     return stat
 
 def change_table(table, i, j):
-    print(i, "i")
-    table[i-1][j-1] = 1
-    return table
-    
+    if table[i][j]!="X":
+        table[i][j] = "X"
+        return table
+    else:
+        return "Already"
+
+def check_tail(inp):
+#    try:
+    if True:
+        coords1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        coords2 = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "k"]
+        c1 = int(inp[:len(inp)-1])
+        c2 = inp[len(inp)-1]
+        if c1 in coords1  and c2 in coords2:
+            return c1, coords2.index(c2)+1
+        else:
+            return "Error"
+            
+
 
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -36,15 +50,21 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 output["text"] = text
                 conn.send(bytes(str(output), "utf-8"))
             elif data == "Start game":
-                text = "Started"
                 table = form_table()
                 stat = form_stat()
-                conn.send(bytes("table", "utf-8"))
-                conn.send(bytes(str(table), "utf-8"))
-            elif data == "shoot":
-                print(table, type(table))
-                print("***********")
-                table = change_table(table, 3, 5)
-                print(table)
-                conn.send(bytes("table", "utf-8"))
-                conn.send(bytes(str(table), "utf-8"))
+                output["table"] = table
+                conn.send(bytes(str(output), "utf-8"))
+            elif data[:5] == "shoot":
+                numbers = check_tail(data[6:])
+                if numbers=="Error":
+                    output["text"] = "incorrect coords. Example: shoot 5b"
+                    conn.send(bytes(str(output), "utf-8"))
+                else:
+                    ans = change_table(table, numbers[0], numbers[1])
+                    if ans=="Already":
+                        output["text"] = "Already attacked"
+                        conn.send(bytes(str(output), "utf-8"))
+                    else:
+                        table = ans
+                        output["table"] = table
+                        conn.send(bytes(str(output), "utf-8"))
