@@ -1,8 +1,10 @@
 import socket
+import threading
+import time
 
 HOST = '127.0.0.1'
-PORT = 65432
-command_set = ["Who", "Start game", "Exit"]
+PORT = 6543
+command_set = ["Who", "Start game", "Exit", "Battle"]
 
 def print_table(data):
     table = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "k"]
@@ -19,6 +21,20 @@ def print_table(data):
 def print_text(data):
     print(data.decode("utf-8"))
 
+def Ping(conn, addr):
+    while not closed:
+        command = "Ping"
+        s.send(command.encode("utf-8"))
+        data = s.recv(1024)
+        if data[0]==5: #ping answer
+            ans = data[1:].decode("utf-8")
+            if ans!=str(addr[1]) and :
+                
+        else:
+            print(data[1:].decode("utf-8"))
+            closed = True
+        time.sleep(1)
+
 def print_data(head, data):
     if head == 1: #text
         print_text(data)
@@ -26,6 +42,9 @@ def print_data(head, data):
         print_table(data)
     elif head == 3: #stat
         pass
+    elif head == 4: #multiplayer
+        thread_2 = threading.Thread(target = Ping, args = (conn, addr, ))
+        thread_1.start()
     return closed
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
