@@ -4,7 +4,7 @@ def name_parser(in_name, arg):
     if in_name=="ins":
         return format(int(arg[1:]), "#014b")+format(0, "012b")
     elif in_name=="add":
-        return format(int(arg[1:], 2), "#014b")+format(1, "012b")
+        return format(int(arg[1:]), "#014b")+format(1, "012b")
 
 def arg0_parser(in_arg):
     for reg in ["R0", "R1", "R2", "R3"]:
@@ -14,8 +14,10 @@ def arg0_parser(in_arg):
 def arg1_parser(in_arg):
     if in_arg.isdigit():
         return bin(int(in_arg))
+    elif in_arg[0]=="-" and in_arg[1:].isdigit():
+        return bin(1) + format(2**23 - int(in_arg[1:]), "023b")
     else:
-         return arg0_parser(in_arg)
+        return arg0_parser(in_arg)
 
 def calc_add(ARG0, ARG1):
     setter = "0b"
@@ -47,6 +49,7 @@ def do(NAME):
             R2 = ARG1
         elif int(NAME[:14], 2)==3:
             R3 = ARG1
+        S = ARG1[:3]
     elif int("0b"+NAME[14:], 2)==1: #add
         setter = calc_add(ARG0, ARG1)
         if int(NAME[:14], 2)==0:
@@ -57,4 +60,5 @@ def do(NAME):
             R2 = setter
         if int(NAME[:14], 2)==3:
             R3 = setter
-    return format(int(R0, 2), "#026b"), format(int(R1, 2), "#026b"), format(int(R2, 2), "#026b"), format(int(R3, 2), "#026b"), format(int(T, 2), "#026b")
+        S = setter[:3]
+    return format(int(R0, 2), "#026b"), format(int(R1, 2), "#026b"), format(int(R2, 2), "#026b"), format(int(R3, 2), "#026b"), format(int(T, 2), "#026b"), format(int(S, 2), "#026b")
